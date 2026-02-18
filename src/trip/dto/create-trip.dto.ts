@@ -5,11 +5,13 @@ import {
   IsBoolean,
   IsArray,
   IsDateString,
+  IsNotEmpty,
 } from 'class-validator';
 import { Trip } from 'src/db/types';
 
 export class CreateTripDto implements Trip {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsOptional()

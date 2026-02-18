@@ -58,7 +58,7 @@ export const trip = pgTable(
     isFavorite: boolean('is_favorite').default(false),
     isPublic: boolean('is_public').default(false),
     userId: text('user_id')
-      .default(sql`(auth.user_id())`)
+      .default(sql`auth.user_id()`)
       .notNull(),
     parentTripId: integer('parent_trip_id'),
     createdAt: timestamp('created_at', {
@@ -82,14 +82,17 @@ export const trip = pgTable(
       foreignColumns: [table.id],
       name: 'trip_parent_trip_id_fkey',
     }).onDelete('cascade'),
+    pgPolicy('view_trips', {
+      as: 'permissive',
+      for: 'select',
+      to: ['public'],
+      using: sql`((is_public = true) OR (user_id = auth.user_id()))`,
+    }),
     pgPolicy('modify_own_trips', {
       as: 'permissive',
       for: 'all',
       to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-      withCheck: sql`(user_id = auth.user_id())`,
     }),
-    pgPolicy('view_trips', { as: 'permissive', for: 'select', to: ['public'] }),
   ],
 );
 
@@ -107,7 +110,7 @@ export const destination = pgTable(
     isFavorite: boolean('is_favorite').default(false),
     tripId: integer('trip_id').notNull(),
     userId: text('user_id')
-      .default(sql`(auth.user_id())`)
+      .default(sql`auth.user_id()`)
       .notNull(),
     createdAt: timestamp('created_at', {
       withTimezone: true,
@@ -131,17 +134,18 @@ export const destination = pgTable(
       foreignColumns: [user.id],
       name: 'destination_user_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('modify_own_destinations', {
-      as: 'permissive',
-      for: 'all',
-      to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-      withCheck: sql`(user_id = auth.user_id())`,
-    }),
     pgPolicy('view_destinations', {
       as: 'permissive',
       for: 'select',
       to: ['public'],
+      using: sql`((user_id = auth.user_id()) OR (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = destination.trip_id) AND (trip.is_public = true)))))`,
+    }),
+    pgPolicy('modify_own_destinations', {
+      as: 'permissive',
+      for: 'all',
+      to: ['authenticated'],
     }),
   ],
 );
@@ -152,7 +156,7 @@ export const travelDetail = pgTable(
     id: serial().primaryKey().notNull(),
     tripId: integer('trip_id').notNull(),
     userId: text('user_id')
-      .default(sql`(auth.user_id())`)
+      .default(sql`auth.user_id()`)
       .notNull(),
     detailType: text('detail_type').notNull(),
     name: text().notNull(),
@@ -189,17 +193,18 @@ export const travelDetail = pgTable(
       foreignColumns: [user.id],
       name: 'travel_detail_user_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('modify_own_travel_details', {
-      as: 'permissive',
-      for: 'all',
-      to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-      withCheck: sql`(user_id = auth.user_id())`,
-    }),
     pgPolicy('view_travel_details', {
       as: 'permissive',
       for: 'select',
       to: ['public'],
+      using: sql`((user_id = auth.user_id()) OR (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = travel_detail.trip_id) AND (trip.is_public = true)))))`,
+    }),
+    pgPolicy('modify_own_travel_details', {
+      as: 'permissive',
+      for: 'all',
+      to: ['authenticated'],
     }),
   ],
 );
@@ -209,7 +214,7 @@ export const bookmark = pgTable(
   {
     id: serial().primaryKey().notNull(),
     userId: text('user_id')
-      .default(sql`(auth.user_id())`)
+      .default(sql`auth.user_id()`)
       .notNull(),
     targetTripId: integer('target_trip_id'),
     targetDestinationId: integer('target_destination_id'),

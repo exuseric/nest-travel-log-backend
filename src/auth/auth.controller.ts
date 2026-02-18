@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
 
@@ -6,10 +6,9 @@ import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('user')
+  @Get('user/:id')
   @UseGuards(ClerkGuard)
-  async getUser(@Req() req: any) {
-    const userId = req.userId;
-    return this.authService.getUser(userId);
+  async getUser(@Param('id') id: string) {
+    return this.authService.getUser(id);
   }
 }
