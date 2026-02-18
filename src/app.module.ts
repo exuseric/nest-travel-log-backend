@@ -5,9 +5,18 @@ import { TripModule } from './trip/trip.module';
 import { DestinationModule } from './destination/destination.module';
 import { TravelDetailModule } from './travel-detail/travel-detail.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TripModule, DestinationModule, TravelDetailModule, BookmarkModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TripModule,
+    DestinationModule,
+    TravelDetailModule,
+    BookmarkModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
