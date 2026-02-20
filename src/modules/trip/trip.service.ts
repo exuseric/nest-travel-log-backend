@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { DB_CONN } from 'src/db/db';
-import * as schema from 'src/db/schema';
-import { Trip } from 'src/db/types';
+import { DB_CONN } from 'src/data/db';
+import * as schema from 'src/data/models';
+import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 
@@ -22,7 +22,7 @@ export class TripService {
   async create(userId: string, createTripDto: CreateTripDto) {
     try {
       const [newTrip] = await this.db
-        .insert(schema.trip)
+        .insert(schema.tripModel)
         .values({ ...createTripDto, userId })
         .returning();
 
@@ -39,7 +39,7 @@ export class TripService {
 
   async findAll(): Promise<Trip[]> {
     try {
-      return await this.db.select().from(schema.trip);
+      return await this.db.select().from(schema.tripModel);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.error('findAll error:', (error as Error).message);
@@ -53,8 +53,8 @@ export class TripService {
     try {
       const [trip] = await this.db
         .select()
-        .from(schema.trip)
-        .where(eq(schema.trip.id, id))
+        .from(schema.tripModel)
+        .where(eq(schema.tripModel.id, id))
         .limit(1);
 
       if (!trip) throw new NotFoundException('No trip found');
@@ -71,9 +71,9 @@ export class TripService {
 
     try {
       const [updatedTrip] = await this.db
-        .update(schema.trip)
+        .update(schema.tripModel)
         .set(updateTripDto)
-        .where(eq(schema.trip.id, id))
+        .where(eq(schema.tripModel.id, id))
         .returning();
 
       if (!updatedTrip) throw new NotFoundException('No trip found');
@@ -90,8 +90,8 @@ export class TripService {
     if (!id) throw new NotFoundException('No trip found');
     try {
       const [deletedTrip] = await this.db
-        .delete(schema.trip)
-        .where(eq(schema.trip.id, id))
+        .delete(schema.tripModel)
+        .where(eq(schema.tripModel.id, id))
         .returning();
 
       if (!deletedTrip) throw new NotFoundException('No trip found');

@@ -2,21 +2,20 @@ import { Inject, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { DB_CONN, PG_POOL } from 'src/db/db';
-import * as schema from 'src/db/schema';
+import { DB_CONN, PG_POOL } from 'src/data/db';
+import * as schema from 'src/data/models';
 
 @Module({
   providers: [
     {
       provide: PG_POOL,
       useFactory: (configService: ConfigService) => {
-        const pool = new Pool({
+        return new Pool({
           connectionString: configService.getOrThrow<string>('DATABASE_URL'),
           ssl: {
             rejectUnauthorized: true,
           },
         });
-        return pool;
       },
       inject: [ConfigService],
     },
