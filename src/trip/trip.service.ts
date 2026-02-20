@@ -1,4 +1,10 @@
-import { HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DB_CONN } from 'src/db/db';
@@ -6,7 +12,6 @@ import * as schema from 'src/db/schema';
 import { Trip } from 'src/db/types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-
 
 @Injectable()
 export class TripService {
