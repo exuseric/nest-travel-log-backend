@@ -12,7 +12,7 @@ import * as schema from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationDto } from '@shared/dto/pagination.dto';
 
 @Injectable()
 export class TripService {

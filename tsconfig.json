@@ -14,6 +14,14 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@app/*": ["src/*"], // Alias "@app" to the baseUrl ("./src")
+      "@shared/*": ["src/shared/*"], // Alias "@shared" to "./src/shared"
+      "@modules/*": ["src/modules/*"], // Alias "@modules" to "./src/modules"
+      "@models/*": ["src/data/models/*"], // Alias "@models" to "./src/data/models"
+      "@db/*": ["src/data/db/*"], // Alias "@db" to "./src/data/db"
+      "@guards/*": ["src/guards/*"] // Alias "@guards" to "./src/guards"
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

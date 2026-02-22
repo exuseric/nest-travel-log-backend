@@ -16,7 +16,7 @@ import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
 import { ClerkSoftGuard } from 'src/guards/clerk/clerk.soft.guard';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationDto } from '@shared/dto/pagination.dto';
 import { TripService } from './trip.service';
 import type { Request } from 'express';
 
