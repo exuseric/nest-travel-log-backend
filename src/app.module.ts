@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { DBModule } from 'src/modules/db/db.module';
@@ -8,6 +9,8 @@ import { TravelDetailModule } from 'src/modules/travel-detail/travel-detail.modu
 import { TripModule } from 'src/modules/trip/trip.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ClerkSoftGuard } from '@guards/clerk/clerk.soft.guard';
+import { DbInterceptor } from '@db/db.interceptor';
 
 @Module({
   imports: [
@@ -20,6 +23,10 @@ import { AppService } from './app.service';
     DBModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: ClerkSoftGuard },
+    { provide: APP_INTERCEPTOR, useClass: DbInterceptor },
+  ],
 })
 export class AppModule {}

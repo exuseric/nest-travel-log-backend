@@ -24,12 +24,12 @@ export class ClerkGuard implements CanActivate {
       const payload = await verifyToken(token, {
         secretKey: process.env.CLERK_SECRET_KEY,
       });
-      req.auth = { userId: payload.sub };
+      // Store both userId and raw token for DbService
+      req.auth = { userId: payload.sub, accessToken: token };
+      console.log(req.auth);
       return true;
     } catch (err) {
       if (err instanceof HttpException) throw err;
-      console.error('Token verification failed:', err);
-
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
