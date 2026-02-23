@@ -4,14 +4,13 @@ import {
   pgTable,
   text,
   timestamp,
-  unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const userModel = pgTable(
   'user',
   {
-    id: text().primaryKey().notNull(),
+    id: text().notNull(),
     name: text(),
     email: text().notNull(),
     avatarUrl: text('avatar_url'),
@@ -26,17 +25,18 @@ export const userModel = pgTable(
     }).defaultNow(),
   },
   (table) => [
-    unique('user_email_key').on(table.email),
     pgPolicy('view_users', {
       as: 'permissive',
       for: 'select',
-      to: ['public'],
+      to: ['anon'],
       using: sql`true`,
     }),
     pgPolicy('manage_own_user', {
       as: 'permissive',
       for: 'all',
-      to: ['authenticated'],
+      to: ['app_authenticated_role'],
+      using: sql`(id = public.user_id())`,
+      withCheck: sql`(id = public.user_id())`,
     }),
   ],
 );

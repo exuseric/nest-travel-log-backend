@@ -11,13 +11,13 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { tripModel } from '@models/TripModel';
 import { userModel } from '@models/UserModel';
+import { tripModel } from '@models/TripModel';
 
 export const destinationModel = pgTable(
   'destination',
   {
-    id: serial().primaryKey().notNull(),
+    id: serial().notNull(),
     name: text().notNull(),
     description: text(),
     latitude: doublePrecision(),
@@ -28,7 +28,7 @@ export const destinationModel = pgTable(
     isFavorite: boolean('is_favorite').default(false),
     tripId: integer('trip_id').notNull(),
     userId: text('user_id')
-      .default(sql`auth.user_id()`)
+      .default(sql`public.user_id()`)
       .notNull(),
     createdAt: timestamp('created_at', {
       withTimezone: true,
@@ -52,26 +52,34 @@ export const destinationModel = pgTable(
       foreignColumns: [userModel.id],
       name: 'destination_user_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('delete_own_destinations', {
+    pgPolicy('view_destinations', {
       as: 'permissive',
-      for: 'delete',
-      to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-    }),
-    pgPolicy('update_own_destinations', {
-      as: 'permissive',
-      for: 'update',
-      to: ['authenticated'],
+      for: 'select',
+      to: ['anon'],
+      using: sql`((user_id = public.user_id()) OR (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = destination.trip_id) AND (trip.is_public = true)))))`,
     }),
     pgPolicy('insert_own_destinations', {
       as: 'permissive',
       for: 'insert',
-      to: ['authenticated'],
+      to: ['app_authenticated_role'],
+      withCheck: sql`((user_id = public.user_id()) AND (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = destination.trip_id) AND (trip.user_id = public.user_id())))))`,
     }),
-    pgPolicy('view_destinations', {
+    pgPolicy('update_own_destinations', {
       as: 'permissive',
-      for: 'select',
-      to: ['public'],
+      for: 'update',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
+      withCheck: sql`(user_id = public.user_id())`,
+    }),
+    pgPolicy('delete_own_destinations', {
+      as: 'permissive',
+      for: 'delete',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
     }),
   ],
 );

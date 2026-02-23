@@ -16,7 +16,7 @@ import { userModel } from '@models/UserModel';
 export const tripModel = pgTable(
   'trip',
   {
-    id: serial().primaryKey().notNull(),
+    id: serial().notNull(),
     name: text().notNull(),
     description: text(),
     latitude: doublePrecision(),
@@ -29,7 +29,7 @@ export const tripModel = pgTable(
     isFavorite: boolean('is_favorite').default(false),
     isPublic: boolean('is_public').default(false),
     userId: text('user_id')
-      .default(sql`auth.user_id()`)
+      .default(sql`public.user_id()`)
       .notNull(),
     parentTripId: integer('parent_trip_id'),
     createdAt: timestamp('created_at', {
@@ -53,22 +53,30 @@ export const tripModel = pgTable(
       foreignColumns: [table.id],
       name: 'trip_parent_trip_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('delete_own_trips', {
+    pgPolicy('view_trips', {
       as: 'permissive',
-      for: 'delete',
-      to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-    }),
-    pgPolicy('update_own_trips', {
-      as: 'permissive',
-      for: 'update',
-      to: ['authenticated'],
+      for: 'select',
+      to: ['anon'],
+      using: sql`((is_public = true) OR (user_id = public.user_id()))`,
     }),
     pgPolicy('insert_own_trips', {
       as: 'permissive',
       for: 'insert',
-      to: ['authenticated'],
+      to: ['app_authenticated_role'],
+      withCheck: sql`(user_id = public.user_id())`,
     }),
-    pgPolicy('view_trips', { as: 'permissive', for: 'select', to: ['public'] }),
+    pgPolicy('update_own_trips', {
+      as: 'permissive',
+      for: 'update',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
+      withCheck: sql`(user_id = public.user_id())`,
+    }),
+    pgPolicy('delete_own_trips', {
+      as: 'permissive',
+      for: 'delete',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
+    }),
   ],
 );

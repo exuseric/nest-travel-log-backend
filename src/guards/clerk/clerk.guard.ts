@@ -26,7 +26,6 @@ export class ClerkGuard implements CanActivate {
       });
       // Store both userId and raw token for DbService
       req.auth = { userId: payload.sub, accessToken: token };
-      console.log(req.auth);
       return true;
     } catch (err) {
       if (err instanceof HttpException) throw err;

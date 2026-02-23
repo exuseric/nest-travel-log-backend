@@ -11,15 +11,16 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { tripModel, userModel } from 'src/data/models';
+import { tripModel } from '@models/TripModel';
+import { userModel } from '@models/UserModel';
 
 export const travelDetailModel = pgTable(
   'travel_detail',
   {
-    id: serial().primaryKey().notNull(),
+    id: serial().notNull(),
     tripId: integer('trip_id').notNull(),
     userId: text('user_id')
-      .default(sql`auth.user_id()`)
+      .default(sql`public.user_id()`)
       .notNull(),
     detailType: text('detail_type').notNull(),
     name: text().notNull(),
@@ -56,26 +57,34 @@ export const travelDetailModel = pgTable(
       foreignColumns: [userModel.id],
       name: 'travel_detail_user_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('delete_own_travel_details', {
+    pgPolicy('view_travel_details', {
       as: 'permissive',
-      for: 'delete',
-      to: ['authenticated'],
-      using: sql`(user_id = auth.user_id())`,
-    }),
-    pgPolicy('update_own_travel_details', {
-      as: 'permissive',
-      for: 'update',
-      to: ['authenticated'],
+      for: 'select',
+      to: ['anon'],
+      using: sql`((user_id = public.user_id()) OR (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = travel_detail.trip_id) AND (trip.is_public = true)))))`,
     }),
     pgPolicy('insert_own_travel_details', {
       as: 'permissive',
       for: 'insert',
-      to: ['authenticated'],
+      to: ['app_authenticated_role'],
+      withCheck: sql`((user_id = public.user_id()) AND (EXISTS ( SELECT 1
+   FROM trip
+  WHERE ((trip.id = travel_detail.trip_id) AND (trip.user_id = public.user_id())))))`,
     }),
-    pgPolicy('view_travel_details', {
+    pgPolicy('update_own_travel_details', {
       as: 'permissive',
-      for: 'select',
-      to: ['public'],
+      for: 'update',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
+      withCheck: sql`(user_id = public.user_id())`,
+    }),
+    pgPolicy('delete_own_travel_details', {
+      as: 'permissive',
+      for: 'delete',
+      to: ['app_authenticated_role'],
+      using: sql`(user_id = public.user_id())`,
     }),
   ],
 );

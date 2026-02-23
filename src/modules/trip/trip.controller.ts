@@ -18,6 +18,7 @@ import { UpdateTripDto } from './dto/update-trip.dto';
 import { PaginationDto } from '@shared/dto/pagination.dto';
 import { TripService } from './trip.service';
 import type { Request } from 'express';
+import { ClerkSoftGuard } from '@guards/clerk/clerk.soft.guard';
 
 @Controller('trips')
 export class TripController {
@@ -28,8 +29,11 @@ export class TripController {
   create(@Req() req: Request, @Body() createTripDto: CreateTripDto) {
     const userId = req.auth?.userId;
     if (!userId) throw new UnauthorizedException();
+    console.log(userId);
     return this.tripService.create(userId, createTripDto);
   }
+
+  @UseGuards(ClerkSoftGuard)
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true }))

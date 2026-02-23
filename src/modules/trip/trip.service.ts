@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Scope,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import * as schema from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
@@ -19,7 +19,16 @@ export class TripService {
 
   async create(userId: string, createTripDto: CreateTripDto) {
     try {
-      const db = await this.dbService.getDb();
+      const db = await this.dbService.getDb(userId);
+      console.log('TripService.create - userId param:', userId);
+      const { rows: userIdFromDb } = await db.execute(
+        sql`SELECT public.user_id() as current_db_user_id`,
+      );
+      console.log(
+        'TripService.create - public.user_id() from DB:',
+        userIdFromDb[0].current_db_user_id,
+      );
+
       const [newTrip] = await db
         .insert(schema.tripModel)
         .values({ ...createTripDto, userId })

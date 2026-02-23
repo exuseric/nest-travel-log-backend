@@ -1,5 +1,9 @@
-// src/modules/db/db.service.ts
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Scope,
+} from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Pool, PoolClient } from 'pg';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -17,34 +21,50 @@ export class DbService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  async getDb(): Promise<NodePgDatabase<typeof schema>> {
+  async getDb(currentUserId?: string): Promise<NodePgDatabase<typeof schema>> {
     if (this._db) return this._db;
 
     this.client = await this.pool.connect();
     const auth = this.request.auth;
 
-    // Begin transaction so set_config local values persist for the request
-    await this.client.query('BEGIN');
+    const effectiveUserId = currentUserId || auth?.userId; // Use passed userId or from auth
 
-    if (auth?.accessToken) {
-      const [, payloadB64] = auth.accessToken.split('.');
-      const claims = JSON.parse(
-        Buffer.from(payloadB64, 'base64url').toString(),
-      );
+    if (effectiveUserId) {
+      // Set public.current_user_id directly
       await this.client.query(
-        `SELECT set_config('request.jwt.claims', $1, true)`,
-        [JSON.stringify(claims)],
+        `SELECT set_config('public.current_user_id', $1, true)`,
+        [effectiveUserId],
       );
-      await this.client.query(`SELECT set_config('request.jwt', $1, true)`, [
-        auth.accessToken,
-      ]);
     } else {
+      // Ensure public.current_user_id is unset or null for anonymous users
       await this.client.query(
-        `SELECT set_config('request.jwt.claims', '', true)`,
+        `SELECT set_config('public.current_user_id', '', true)`,
       );
-      await this.client.query(`SELECT set_config('request.jwt', '', true)`);
     }
 
+    await this.client.query('BEGIN');
+    const { rows: userIdAfterBegin } = await this.client.query(
+      `SELECT public.user_id() as user_id_after_begin`,
+    );
+    const { rows: currentUser } = await this.client.query(
+      `SELECT current_user as current_db_user;`,
+    );
+    const { rows: currentRole } = await this.client.query(
+      `SELECT current_role as current_db_role;`,
+    );
+
+    console.log(
+      'DbService: user_id() after BEGIN:',
+      userIdAfterBegin[0].user_id_after_begin,
+    );
+    console.log(
+      'DbService: current_user after BEGIN:',
+      currentUser[0].current_db_user,
+    );
+    console.log(
+      'DbService: current_role after BEGIN:',
+      currentRole[0].current_db_role,
+    );
     this._db = drizzle(this.client, { schema });
     return this._db;
   }
@@ -56,6 +76,7 @@ export class DbService {
       } catch {
         await this.client.query('ROLLBACK');
       } finally {
+        await this.client.query(`RESET ROLE`); // Reset role on connection release
         this.client.release();
         this.client = undefined;
         this._db = undefined;
