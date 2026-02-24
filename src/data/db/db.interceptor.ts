@@ -2,19 +2,24 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
+  Logger,
   NestInterceptor,
   Scope,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { DbService } from '@modules/db/db.service';
+import { DBService } from '@modules/db/db.service';
 
 @Injectable({ scope: Scope.REQUEST })
-export class DbInterceptor implements NestInterceptor {
-  constructor(private dbService: DbService) {}
+export class DBInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(DBInterceptor.name);
+
+  constructor(private dbService: DBService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const release = () => {
-      void this.dbService.release();
+      this.dbService.release().catch((err) => {
+        this.logger.error('Failed to release DB connection', err);
+      });
     };
 
     return next.handle().pipe(

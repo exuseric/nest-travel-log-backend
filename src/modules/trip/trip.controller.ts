@@ -42,6 +42,11 @@ export class TripController {
     return this.tripService.findAll(paginationDto);
   }
 
+  @Get('/debug')
+  debugAuth(@Req() req: Request) {
+    return this.tripService.debugAuth(req);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tripService.findOne(+id);

@@ -1,9 +1,10 @@
 import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Pool } from 'pg';
+// import { Pool } from 'pg';
+import { Pool } from '@neondatabase/serverless';
 import { PG_POOL } from '@db/index';
-import { DbService } from './db.service';
-import { DbInterceptor } from '@db/db.interceptor';
+import { DBService } from './db.service';
+import { DBInterceptor } from '@db/db.interceptor';
 
 @Global()
 @Module({
@@ -18,10 +19,10 @@ import { DbInterceptor } from '@db/db.interceptor';
       },
       inject: [ConfigService],
     },
-    DbService,
-    DbInterceptor,
+    DBService,
+    DBInterceptor,
   ],
-  exports: [PG_POOL, DbService, DbInterceptor],
+  exports: [PG_POOL, DBService, DBInterceptor],
 })
 export class DBModule {
   constructor(@Inject(PG_POOL) private pool: Pool) {}

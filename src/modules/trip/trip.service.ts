@@ -1,3 +1,6 @@
+import { TRIP_DEFAULT_INSERT, TRIP_DEFAULT_SELECT } from '@app/data/constants';
+import { SelectTripDto } from '@app/modules/trip/dto/select-trip.dto';
+import { DBService } from '@modules/db/db.service';
 import {
   HttpException,
   Injectable,
@@ -5,33 +8,27 @@ import {
   NotFoundException,
   Scope,
 } from '@nestjs/common';
+import { PaginationDto } from '@shared/dto/pagination.dto';
 import { eq, sql } from 'drizzle-orm';
-import * as schema from 'src/data/models';
+import { tripModel } from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { PaginationDto } from '@shared/dto/pagination.dto';
-import { DbService } from '@modules/db/db.service';
+import { TripModelSelect } from '@app/data/types';
+import { Request } from 'express';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TripService {
-  constructor(private dbService: DbService) {}
+  constructor(private dbService: DBService) {}
 
   async create(userId: string, createTripDto: CreateTripDto) {
     try {
-      const db = await this.dbService.getDb(userId);
+      const db = await this.dbService.getDb();
       console.log('TripService.create - userId param:', userId);
-      const { rows: userIdFromDb } = await db.execute(
-        sql`SELECT public.user_id() as current_db_user_id`,
-      );
-      console.log(
-        'TripService.create - public.user_id() from DB:',
-        userIdFromDb[0].current_db_user_id,
-      );
 
       const [newTrip] = await db
-        .insert(schema.tripModel)
-        .values({ ...createTripDto, userId })
+        .insert(tripModel)
+        .values({ ...createTripDto })
         .returning();
 
       if (!newTrip) {
@@ -45,12 +42,12 @@ export class TripService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<Trip[]> {
+  async findAll(paginationDto: PaginationDto): Promise<SelectTripDto[]> {
     try {
       const db = await this.dbService.getDb();
       return await db
-        .select()
-        .from(schema.tripModel)
+        .select(TRIP_DEFAULT_SELECT)
+        .from(tripModel)
         .limit(paginationDto.limit ?? 10)
         .offset(paginationDto.offset ?? 0);
     } catch (error) {
@@ -60,16 +57,16 @@ export class TripService {
     }
   }
 
-  async findOne(id: Trip['id']): Promise<Trip> {
+  async findOne(id: Trip['id']): Promise<TripModelSelect> {
     if (id == null) throw new NotFoundException('No trip found');
 
     try {
       const db = await this.dbService.getDb();
 
       const [trip] = await db
-        .select()
-        .from(schema.tripModel)
-        .where(eq(schema.tripModel.id, id))
+        .select(TRIP_DEFAULT_SELECT)
+        .from(tripModel)
+        .where(eq(tripModel.id, id))
         .limit(1);
 
       if (!trip) throw new NotFoundException('No trip found');
@@ -88,9 +85,9 @@ export class TripService {
       const db = await this.dbService.getDb();
 
       const [updatedTrip] = await db
-        .update(schema.tripModel)
+        .update(tripModel)
         .set(updateTripDto)
-        .where(eq(schema.tripModel.id, id))
+        .where(eq(tripModel.id, id))
         .returning();
 
       if (!updatedTrip) throw new NotFoundException('No trip found');
@@ -109,8 +106,8 @@ export class TripService {
       const db = await this.dbService.getDb();
 
       const [deletedTrip] = await db
-        .delete(schema.tripModel)
-        .where(eq(schema.tripModel.id, id))
+        .delete(tripModel)
+        .where(eq(tripModel.id, id))
         .returning();
 
       if (!deletedTrip) throw new NotFoundException('No trip found');
@@ -120,5 +117,15 @@ export class TripService {
       console.error(error);
       throw new InternalServerErrorException('Failed to delete trip');
     }
+  }
+
+  async debugAuth(req: Request) {
+    const db = await this.dbService.getDb();
+    const result = await db.execute(sql`
+      SELECT
+        auth.user_id() as rls_user_id,
+        set_config('request.jwt', $1, true)
+    `);
+    return { reqAuth: req.auth, dbResult: result.rows[0] };
   }
 }

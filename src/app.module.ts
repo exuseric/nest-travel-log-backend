@@ -10,7 +10,7 @@ import { TripModule } from 'src/modules/trip/trip.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClerkSoftGuard } from '@guards/clerk/clerk.soft.guard';
-import { DbInterceptor } from '@db/db.interceptor';
+import { DBInterceptor } from '@db/db.interceptor';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { DbInterceptor } from '@db/db.interceptor';
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: ClerkSoftGuard },
-    { provide: APP_INTERCEPTOR, useClass: DbInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: DBInterceptor },
   ],
 })
 export class AppModule {}

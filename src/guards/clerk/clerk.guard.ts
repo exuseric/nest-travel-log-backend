@@ -25,7 +25,8 @@ export class ClerkGuard implements CanActivate {
         secretKey: process.env.CLERK_SECRET_KEY,
       });
       // Store both userId and raw token for DbService
-      req.auth = { userId: payload.sub, accessToken: token };
+      req.auth = { userId: payload.sub, accessToken: token, payload };
+
       return true;
     } catch (err) {
       if (err instanceof HttpException) throw err;
