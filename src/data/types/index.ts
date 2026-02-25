@@ -3,14 +3,10 @@ import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 
 export type TripModelSelect = Omit<
   InferSelectModel<typeof tripModel>,
-  'userId' | 'gallery'
-> & {
-  gallery?: string[] | null;
-};
+  'userId'
+>;
 
 export type TripModelInsert = Omit<
   InferInsertModel<typeof tripModel>,
-  'userId' | 'gallery'
-> & {
-  gallery?: string[] | null;
-};
+  'userId'
+>;

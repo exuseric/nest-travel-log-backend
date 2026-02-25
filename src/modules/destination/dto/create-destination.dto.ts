@@ -22,11 +22,11 @@ export class CreateDestinationDto implements CreateDestinationType {
 
   @IsLatitude()
   @IsOptional()
-  latitude?: number;
+  latitude: number;
 
   @IsLongitude()
   @IsOptional()
-  longitude?: number;
+  longitude: number;
 
   @IsString()
   @IsOptional()
@@ -44,9 +44,9 @@ export class CreateDestinationDto implements CreateDestinationType {
   @IsOptional()
   isFavorite?: boolean;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  tripId: number;
+  tripId: string;
 
   @IsBoolean()
   @IsOptional()

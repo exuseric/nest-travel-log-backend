@@ -13,4 +13,7 @@ export class CreateTripDto implements TripModelInsert {
   @IsNumber()
   @IsNotEmpty()
   longitude: number;
+
+  @IsString()
+  city: string;
 }
