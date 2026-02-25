@@ -9,29 +9,27 @@ import {
 } from 'class-validator';
 
 export class SelectTripDto implements TripModelSelect {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  id: number;
+  id: string;
 
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  latitude: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  longitude: number;
 
   @IsString()
   @IsOptional()
   description: string | null;
 
   @IsString()
+  country: string;
+
+  @IsString()
+  city: string;
+
+  @IsString()
   @IsOptional()
-  country: string | null;
+  county: string | null;
 
   @IsString()
   @IsOptional()
@@ -45,23 +43,22 @@ export class SelectTripDto implements TripModelSelect {
   @IsOptional()
   coverImage: string | null;
 
-  @IsOptional()
   @IsArray()
-  gallery: string[] | null;
+  gallery: string[];
 
   @IsString()
   @IsOptional()
-  createdAt: string | null;
+  createdAt: string;
 
   @IsString()
-  @IsOptional()
-  updatedAt: string | null;
+  updatedAt: string;
 
   @IsBoolean()
-  @IsOptional()
-  isFavorite: boolean | null;
+  isFavorite: boolean;
 
   @IsBoolean()
-  @IsOptional()
-  isPublic: boolean | null;
+  isPublic: boolean;
+
+  @IsBoolean()
+  isArchived: boolean;
 }

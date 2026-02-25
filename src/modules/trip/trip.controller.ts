@@ -42,18 +42,18 @@ export class TripController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tripService.findOne(+id);
+    return this.tripService.findOne(id);
   }
 
   @UseGuards(ClerkGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTripDto: UpdateTripDto) {
-    return this.tripService.update(+id, updateTripDto);
+    return this.tripService.update(id, updateTripDto);
   }
 
   @UseGuards(ClerkGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tripService.remove(+id);
+    return this.tripService.remove(id);
   }
 }

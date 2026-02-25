@@ -52,7 +52,7 @@ export class DestinationService {
   }
 
   async findAllByTrip(
-    tripId: number,
+    tripId: Destination['tripId'],
     pagination: PaginationDto,
   ): Promise<Destination[]> {
     try {
@@ -72,7 +72,7 @@ export class DestinationService {
     }
   }
 
-  async findOne(id: number): Promise<Destination> {
+  async findOne(id: Destination['id']): Promise<Destination> {
     if (id == null) throw new NotFoundException('No destination found');
     try {
       const db = await this.dbService.getDb();
@@ -95,7 +95,7 @@ export class DestinationService {
   }
 
   async update(
-    id: number,
+    id: Destination['id'],
     updateDestinationDto: UpdateDestinationDto,
   ): Promise<Destination> {
     if (id == null) throw new NotFoundException('No destination found');
@@ -119,7 +119,7 @@ export class DestinationService {
     }
   }
 
-  async remove(id: number): Promise<{ success: boolean }> {
+  async remove(id: Destination['id']): Promise<{ success: boolean }> {
     if (id == null) throw new NotFoundException('No destination found');
     try {
       const db = await this.dbService.getDb();

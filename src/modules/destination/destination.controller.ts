@@ -45,12 +45,12 @@ export class DestinationController {
     @Param('tripId') tripId: string,
     @Query(new ValidationPipe({ transform: true })) pagination: PaginationDto,
   ) {
-    return this.destinationService.findAllByTrip(+tripId, pagination);
+    return this.destinationService.findAllByTrip(tripId, pagination);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.destinationService.findOne(+id);
+    return this.destinationService.findOne(id);
   }
 
   @UseGuards(ClerkGuard)
@@ -59,12 +59,12 @@ export class DestinationController {
     @Param('id') id: string,
     @Body() updateDestinationDto: UpdateDestinationDto,
   ) {
-    return this.destinationService.update(+id, updateDestinationDto);
+    return this.destinationService.update(id, updateDestinationDto);
   }
 
   @UseGuards(ClerkGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.destinationService.remove(+id);
+    return this.destinationService.remove(id);
   }
 }

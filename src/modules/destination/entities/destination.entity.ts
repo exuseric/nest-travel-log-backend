@@ -1,19 +1,23 @@
 import { DestinationSelectType } from '@shared/types/model.types';
 
 export class Destination implements DestinationSelectType {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   country: string | null;
   coverImage: string | null;
-  gallery: string[] | null;
-  isFavorite: boolean | null;
-  tripId: number;
+  gallery: string[];
+  isFavorite: boolean;
+  tripId: string;
   userId: string;
-  createdAt: string | null;
-  updatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
   isVerified: boolean | null;
   isVisited: boolean | null;
+  city: string;
+  county: string;
+  locale: string;
+  order: number;
 }

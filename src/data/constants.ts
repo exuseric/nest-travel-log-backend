@@ -3,10 +3,10 @@ import { destinationModel, tripModel } from '@app/data/models';
 export const TRIP_DEFAULT_SELECT = {
   id: tripModel.id,
   name: tripModel.name,
-  description: tripModel.description,
-  latitude: tripModel.latitude,
-  longitude: tripModel.longitude,
   country: tripModel.country,
+  city: tripModel.city,
+  county: tripModel.county,
+  description: tripModel.description,
   startDate: tripModel.startDate,
   endDate: tripModel.endDate,
   coverImage: tripModel.coverImage,
@@ -15,12 +15,7 @@ export const TRIP_DEFAULT_SELECT = {
   updatedAt: tripModel.updatedAt,
   isFavorite: tripModel.isFavorite,
   isPublic: tripModel.isPublic,
-};
-
-export const TRIP_DEFAULT_INSERT = {
-  name: tripModel.name,
-  latitude: tripModel.latitude,
-  longitude: tripModel.longitude,
+  isArchived: tripModel.isArchived,
 };
 
 export const DESTINATION_DEFAULT_SELECT = {
