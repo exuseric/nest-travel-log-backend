@@ -7,7 +7,8 @@ export class ClerkSoftGuard extends ClerkGuard {
     try {
       return await super.canActivate(context);
     } catch {
-      // Not authenticated — allow through but req.auth will be undefined
+      // Not authenticated — allow through, req.auth will be undefined
+      // DbService will set anon role, RLS will only show public content
       return true;
     }
   }

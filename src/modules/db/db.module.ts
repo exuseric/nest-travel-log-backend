@@ -1,10 +1,12 @@
-import { Inject, Module } from '@nestjs/common';
+import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { DB_CONN, PG_POOL } from 'src/data/db';
-import * as schema from 'src/data/models';
+// import { Pool } from 'pg';
+import { Pool } from '@neondatabase/serverless';
+import { PG_POOL } from '@db/index';
+import { DBService } from './db.service';
+import { DBInterceptor } from '@db/db.interceptor';
 
+@Global()
 @Module({
   providers: [
     {
@@ -12,26 +14,20 @@ import * as schema from 'src/data/models';
       useFactory: (configService: ConfigService) => {
         return new Pool({
           connectionString: configService.getOrThrow<string>('DATABASE_URL'),
-          ssl: {
-            rejectUnauthorized: true,
-          },
+          ssl: { rejectUnauthorized: true },
         });
       },
       inject: [ConfigService],
     },
-    {
-      provide: DB_CONN,
-      useFactory: (pool: Pool) => drizzle(pool, { schema }),
-      inject: [PG_POOL],
-    },
+    DBService,
+    DBInterceptor,
   ],
-  exports: [DB_CONN, PG_POOL],
+  exports: [PG_POOL, DBService, DBInterceptor],
 })
 export class DBModule {
   constructor(@Inject(PG_POOL) private pool: Pool) {}
 
   async onModuleDestroy() {
-    console.log('Destroying pool...');
     await this.pool.end();
   }
 }

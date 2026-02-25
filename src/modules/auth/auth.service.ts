@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { getClerkClient } from 'src/guards/lib/clerk-client';
+import { getClerkClient } from '@guards/clerk/lib/clerk-client';
 
 @Injectable()
 export class AuthService {

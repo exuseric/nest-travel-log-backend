@@ -1,5 +1,9 @@
 declare namespace Express {
   interface Request {
-    auth?: { userId: string };
+    auth?: {
+      userId: string;
+      accessToken: string;
+      payload: any;
+    };
   }
 }

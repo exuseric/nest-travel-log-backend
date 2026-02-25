@@ -1,30 +1,33 @@
+import { TRIP_DEFAULT_SELECT } from '@app/data/constants';
+import { TripModelSelect } from '@app/data/types';
+import { SelectTripDto } from '@app/modules/trip/dto/select-trip.dto';
+import { DBService } from '@modules/db/db.service';
 import {
   HttpException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Scope,
 } from '@nestjs/common';
+import { PaginationDto } from '@shared/dto/pagination.dto';
 import { eq } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { DB_CONN } from 'src/data/db';
-import * as schema from 'src/data/models';
+import { tripModel } from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { PaginationDto } from './dto/pagination.dto';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class TripService {
-  constructor(
-    @Inject(DB_CONN) private readonly db: NodePgDatabase<typeof schema>,
-  ) {}
+  constructor(private dbService: DBService) {}
 
   async create(userId: string, createTripDto: CreateTripDto) {
     try {
-      const [newTrip] = await this.db
-        .insert(schema.tripModel)
-        .values({ ...createTripDto, userId })
+      const db = await this.dbService.getDb();
+      console.log('TripService.create - userId param:', userId);
+
+      const [newTrip] = await db
+        .insert(tripModel)
+        .values({ ...createTripDto })
         .returning();
 
       if (!newTrip) {
@@ -38,13 +41,14 @@ export class TripService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<Trip[]> {
+  async findAll(paginationDto: PaginationDto): Promise<SelectTripDto[]> {
     try {
-      return await this.db
-        .select()
-        .from(schema.tripModel)
+      const db = await this.dbService.getDb();
+      return await db
+        .select(TRIP_DEFAULT_SELECT)
+        .from(tripModel)
         .limit(paginationDto.limit ?? 10)
-        .offset(paginationDto.offset ?? 20);
+        .offset(paginationDto.offset ?? 0);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.error('findAll error:', (error as Error).message);
@@ -52,14 +56,16 @@ export class TripService {
     }
   }
 
-  async findOne(id: Trip['id']): Promise<Trip> {
+  async findOne(id: Trip['id']): Promise<TripModelSelect> {
     if (id == null) throw new NotFoundException('No trip found');
 
     try {
-      const [trip] = await this.db
-        .select()
-        .from(schema.tripModel)
-        .where(eq(schema.tripModel.id, id))
+      const db = await this.dbService.getDb();
+
+      const [trip] = await db
+        .select(TRIP_DEFAULT_SELECT)
+        .from(tripModel)
+        .where(eq(tripModel.id, id))
         .limit(1);
 
       if (!trip) throw new NotFoundException('No trip found');
@@ -75,10 +81,12 @@ export class TripService {
     if (id == null) throw new NotFoundException('No trip found');
 
     try {
-      const [updatedTrip] = await this.db
-        .update(schema.tripModel)
+      const db = await this.dbService.getDb();
+
+      const [updatedTrip] = await db
+        .update(tripModel)
         .set(updateTripDto)
-        .where(eq(schema.tripModel.id, id))
+        .where(eq(tripModel.id, id))
         .returning();
 
       if (!updatedTrip) throw new NotFoundException('No trip found');
@@ -94,9 +102,11 @@ export class TripService {
   async remove(id: Trip['id']) {
     if (id == null) throw new NotFoundException('No trip found');
     try {
-      const [deletedTrip] = await this.db
-        .delete(schema.tripModel)
-        .where(eq(schema.tripModel.id, id))
+      const db = await this.dbService.getDb();
+
+      const [deletedTrip] = await db
+        .delete(tripModel)
+        .where(eq(tripModel.id, id))
         .returning();
 
       if (!deletedTrip) throw new NotFoundException('No trip found');
