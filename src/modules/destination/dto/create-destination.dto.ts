@@ -1,3 +1,4 @@
+import { DestinationModelInsert } from '@app/data/types';
 import {
   IsArray,
   IsBoolean,
@@ -9,9 +10,8 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
-import { CreateDestinationType } from '@shared/types/model.types';
 
-export class CreateDestinationDto implements CreateDestinationType {
+export class CreateDestinationDto implements DestinationModelInsert {
   @IsString()
   @IsNotEmpty()
   name: string;

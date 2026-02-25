@@ -1,6 +1,6 @@
-import { DestinationSelectType } from '@shared/types/model.types';
+import { Destination as DestinationType } from '@shared/types/model.types';
 
-export class Destination implements DestinationSelectType {
+export class Destination implements DestinationType {
   id: string;
   name: string;
   description: string | null;

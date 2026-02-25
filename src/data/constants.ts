@@ -1,4 +1,4 @@
-import { destinationModel, tripModel } from '@app/data/models';
+import { bookmarkModel, destinationModel, tripModel } from '@app/data/models';
 
 export const TRIP_DEFAULT_SELECT = {
   id: tripModel.id,
@@ -43,4 +43,11 @@ export const DESTINATION_DEFAULT_INSERT = {
   gallery: destinationModel.gallery,
   isFavorite: destinationModel.isFavorite,
   tripId: destinationModel.tripId,
+};
+
+export const BOOKMARK_DEFAULT_SELECT = {
+  id: bookmarkModel.id,
+  targetTripId: bookmarkModel.targetTripId,
+  targetDestinationId: bookmarkModel.targetDestinationId,
+  createdAt: bookmarkModel.createdAt,
 };
