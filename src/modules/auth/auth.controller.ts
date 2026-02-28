@@ -20,6 +20,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('user')
+  @UseGuards(ClerkGuard)
   @ApiOperation({ summary: 'Add a new user to the database' })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.createUser(createUserDto);
