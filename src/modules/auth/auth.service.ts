@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, Scope } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Scope,
+} from '@nestjs/common';
 import { getClerkClient } from '@guards/clerk/lib/clerk-client';
 import { DBService } from '@modules/db/db.service';
 import { userModel } from 'src/data/models';
@@ -40,7 +44,6 @@ export class AuthService {
 
       return newUser;
     } catch (error) {
-      console.error('upsertUser error:', error);
       throw new InternalServerErrorException('Failed to synchronize user');
     }
   }

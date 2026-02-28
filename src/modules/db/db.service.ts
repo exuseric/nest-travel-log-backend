@@ -43,6 +43,11 @@ export class DBService {
     } catch (error) {
       this.logger.error('Failed to initialize DB transaction', error as Error);
       if (this.client) {
+        try {
+          await this.client.query('ROLLBACK');
+        } catch (rollbackError) {
+          this.logger.error('Rollback failed after initialization error', rollbackError as Error);
+        }
         this.client.release();
         this.client = undefined;
       }

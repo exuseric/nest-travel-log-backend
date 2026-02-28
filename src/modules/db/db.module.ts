@@ -43,8 +43,11 @@ export class DBModule implements OnModuleInit, OnModuleDestroy {
 
     try {
       const client = await this.pool.connect();
-      await client.query('SELECT 1');
-      client.release();
+      try {
+        await client.query('SELECT 1');
+      } finally {
+        client.release();
+      }
     } catch (error) {
       this.logger.error(
         'Failed to connect to PostgreSQL on startup. Check DATABASE_URL credentials.',

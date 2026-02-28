@@ -65,8 +65,6 @@ export class WebhooksController {
 
     const { type, data } = evt;
 
-    console.log(data);
-
     switch (type) {
       case 'user.created':
       case 'user.updated': {

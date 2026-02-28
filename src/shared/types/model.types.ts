@@ -5,7 +5,9 @@ export type Trip = InferSelectModel<typeof schema.tripModel>;
 export type CreateTrip = InferInsertModel<typeof schema.tripModel>;
 
 export type Destination = InferSelectModel<typeof schema.destinationModel>;
-export type CreateDestination = InferInsertModel<typeof schema.destinationModel>;
+export type CreateDestination = InferInsertModel<
+  typeof schema.destinationModel
+>;
 
 export type User = InferSelectModel<typeof schema.userModel>;
 export type CreateUser = InferInsertModel<typeof schema.userModel>;
