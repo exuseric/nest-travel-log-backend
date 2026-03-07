@@ -11,6 +11,10 @@ import {
   CreateTripMember,
   User,
   CreateUser,
+  GeneralCollection,
+  CreateGeneralCollection,
+  Region,
+  CreateRegion,
 } from '@shared/types/model.types';
 
 // Trip
@@ -36,3 +40,11 @@ export type TripMemberModelInsert = CreateTripMember;
 // User
 export type UserModelSelect = User;
 export type UserModelInsert = CreateUser;
+
+// GeneralCollection
+export type GeneralCollectionModelSelect = Omit<GeneralCollection, 'createdAt' | 'updatedAt'>;
+export type GeneralCollectionModelInsert = CreateGeneralCollection;
+
+// Region
+export type RegionModelSelect = Region;
+export type RegionModelInsert = CreateRegion;

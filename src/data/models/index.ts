@@ -4,3 +4,6 @@ export * from './travel-detail.model';
 export * from './destination.model';
 export * from './bookmark.model';
 export * from './trip-member.model';
+export * from './general-collections.model';
+export * from './region.model';
+export * from './trip-to-general-collection.model';

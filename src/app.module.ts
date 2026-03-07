@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClerkSoftGuard } from '@guards/clerk/clerk.soft.guard';
 import { DBInterceptor } from '@db/db.interceptor';
+import { GeneralCollectionModule } from '@modules/general-collection/general-collection.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DBInterceptor } from '@db/db.interceptor';
     BookmarkModule,
     AuthModule,
     DBModule,
+    GeneralCollectionModule,
   ],
   controllers: [AppController],
   providers: [
@@ -29,4 +31,4 @@ import { DBInterceptor } from '@db/db.interceptor';
     { provide: APP_INTERCEPTOR, useClass: DBInterceptor },
   ],
 })
-export class AppModule {}
+export class AppModule { }
