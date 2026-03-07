@@ -22,3 +22,20 @@ export type CreateTravelDetail = InferInsertModel<
 
 export type TripMember = InferSelectModel<typeof schema.tripMemberModel>;
 export type CreateTripMember = InferInsertModel<typeof schema.tripMemberModel>;
+
+export type GeneralCollection = InferSelectModel<
+  typeof schema.generalCollectionModel
+>;
+export type CreateGeneralCollection = InferInsertModel<
+  typeof schema.generalCollectionModel
+>;
+
+export type Region = InferSelectModel<typeof schema.regionModel>;
+export type CreateRegion = InferInsertModel<typeof schema.regionModel>;
+
+export type TripToGeneralCollection = InferSelectModel<
+  typeof schema.tripToGeneralCollectionModel
+>;
+export type CreateTripToGeneralCollection = InferInsertModel<
+  typeof schema.tripToGeneralCollectionModel
+>;

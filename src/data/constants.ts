@@ -1,4 +1,9 @@
-import { bookmarkModel, destinationModel, tripModel } from '@app/data/models';
+import {
+  bookmarkModel,
+  destinationModel,
+  tripModel,
+  generalCollectionModel,
+} from '@app/data/models';
 
 export const TRIP_DEFAULT_SELECT = {
   id: tripModel.id,
@@ -16,6 +21,15 @@ export const TRIP_DEFAULT_SELECT = {
   isFavorite: tripModel.isFavorite,
   isPublic: tripModel.isPublic,
   isArchived: tripModel.isArchived,
+};
+
+export const GENERAL_COLLECTION_DEFAULT_SELECT = {
+  id: generalCollectionModel.id,
+  name: generalCollectionModel.name,
+  description: generalCollectionModel.description,
+  coverImage: generalCollectionModel.coverImage,
+  regionId: generalCollectionModel.regionId,
+  isActive: generalCollectionModel.isActive
 };
 
 export const DESTINATION_DEFAULT_SELECT = {
