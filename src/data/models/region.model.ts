@@ -12,7 +12,7 @@ export const regionModel = pgTable(
   'region',
   {
     id: uuid()
-      .default(sql`uuid_generate_v4()`)
+      .defaultRandom()
       .primaryKey()
       .notNull(),
     name: text().notNull(),
@@ -26,13 +26,5 @@ export const regionModel = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
-  },
-  (table) => [
-    pgPolicy('region_select_all', {
-      as: 'permissive',
-      for: 'select',
-      to: ['public'],
-      using: sql`true`,
-    }),
-  ],
+  }
 );
