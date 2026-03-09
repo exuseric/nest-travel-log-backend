@@ -3,6 +3,7 @@ import {
   destinationModel,
   tripModel,
   generalCollectionModel,
+  regionModel,
 } from '@app/data/models';
 
 export const TRIP_DEFAULT_SELECT = {
@@ -21,6 +22,17 @@ export const TRIP_DEFAULT_SELECT = {
   isFavorite: tripModel.isFavorite,
   isPublic: tripModel.isPublic,
   isArchived: tripModel.isArchived,
+};
+
+export const REGION_DEFAULT_SELECT = {
+  id: regionModel.id,
+  name: regionModel.name,
+  description: regionModel.description,
+  country: regionModel.country,
+  latitude: regionModel.latitude,
+  longitude: regionModel.longitude,
+  createdAt: regionModel.createdAt,
+  updatedAt: regionModel.updatedAt,
 };
 
 export const GENERAL_COLLECTION_DEFAULT_SELECT = {

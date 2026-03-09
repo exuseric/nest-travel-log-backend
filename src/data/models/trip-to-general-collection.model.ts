@@ -1,13 +1,12 @@
-import { sql } from 'drizzle-orm';
-import { pgPolicy, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { tripModel } from './trip.model';
+import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { generalCollectionModel } from './general-collections.model';
+import { tripModel } from './trip.model';
 
 export const tripToGeneralCollectionModel = pgTable(
   'trip_to_general_collection',
   {
     id: uuid()
-      .default(sql`uuid_generate_v4()`)
+      .defaultRandom()
       .primaryKey()
       .notNull(),
     tripId: uuid('trip_id')
@@ -19,13 +18,5 @@ export const tripToGeneralCollectionModel = pgTable(
     addedAt: timestamp('added_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
-  },
-  (table) => [
-    pgPolicy('trip_to_general_collection_select_all', {
-      as: 'permissive',
-      for: 'select',
-      to: ['public'],
-      using: sql`true`,
-    }),
-  ],
+  }
 );
